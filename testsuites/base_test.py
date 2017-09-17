@@ -1,23 +1,24 @@
 # -*- coding: utf-8 -*-
-from selenium.webdriver.firefox.webdriver import WebDriver
-from selenium.webdriver.common.action_chains import ActionChains
-import time, unittest
+import time
+import unittest
 
 from framework.browser_engine import BrowserEngine
 from pageobjects.login import LoginPage
-
-#Testecase是一个定好的测试框架。TestLogin是基于estCase的一个类
+# Testecase是一个定好的测试框架。TestLogin是基于estCase的一个类
 from pageobjects.logout import LogoutPage
+from pageobjects.production_monitoring import ProductionMonitoringPage
 
 
-class TestLogin(unittest.TestCase):
+class BaseTest(unittest.TestCase):
+
     def setUp(self):
         browse = BrowserEngine(self)
         self.driver = browse.open_browser(self)
-    def test_login(self):
+        self.login()
+
+    def login(self):
         success = True
         driver = self.driver
-        #driver.get("https://nccloud.weihong.com.cn/nccloudmes/view/login.html")
 
         login_page = LoginPage(self.driver)
         login_page.type_login("18329030871","123456","520135")
@@ -32,8 +33,6 @@ class TestLogin(unittest.TestCase):
         except Exception as e:
             print('Test Fail.', format(e))
 
-
-
     def logout(self):
         sccess = True
         driver = self.driver
@@ -41,7 +40,6 @@ class TestLogin(unittest.TestCase):
         time.sleep(2)
         logout_page = LogoutPage(self.driver)
         logout_page.send_submit_btn()
-
 
     def tearDown(self):
         self.logout()
