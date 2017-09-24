@@ -11,10 +11,13 @@ from pageobjects.production_monitoring import ProductionMonitoringPage
 
 class BaseTest(unittest.TestCase):
 
+    url_msg_warning = "https://nccloud.weihong.com.cn/nccloudmes/view/msg_warming.html"
+
     def setUp(self):
         browse = BrowserEngine(self)
         self.driver = browse.open_browser(self)
-        self.login()
+        #self.login()
+        self.loginByToken()
 
     def login(self):
         success = True
@@ -32,6 +35,14 @@ class BaseTest(unittest.TestCase):
             print('Test Pass.')
         except Exception as e:
             print('Test Fail.', format(e))
+
+    def loginByToken(self):
+        username = 'jmine'
+        password = 'e10adc3949ba59abbe56e057f20f883e'
+        token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiMTgzMjkwMzA4NzEiLCJleHAiOjE1MDg4MDMyMDAsImlhdCI6MTUwNjI0MzYzN30.T_dVzr7QHKKCXUw-0tEXJr490u8DvsDec0YEWuWrPMw'
+        script = "var n={company:'维宏',email:'test@126.com',names:'lili',openid:'123456', phone:'18729030871',username:'" + username + "',password:'" + password + "',token:'" + token + "'};" + "window.localStorage.userData = JSON.stringify(n)"
+        self.driver.execute_script(script)
+        self.driver.get(self.url_msg_warning)
 
     def logout(self):
         sccess = True

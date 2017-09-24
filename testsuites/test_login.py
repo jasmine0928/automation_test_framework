@@ -21,10 +21,8 @@ class TestLogin(unittest.TestCase):
 
         login_page = LoginPage(self.driver)
         login_page.type_login("18329030871","123456","520135")
-        login_page.get_windows_img()  # 调用基类截图方法
-
         login_page.send_submit_btn()
-        login_page.get_windows_img()  # 调用基类截图方法
+
 
         try:
             assert unicode('消息报警', "utf8")  in login_page.get_page_title()  # 调用页面对象继承基类中的获取页面标题方法

@@ -2,9 +2,8 @@
 import os.path
 import time
 
-from selenium.common.exceptions import NoSuchElementException
-
 from framework.logger import Logger
+from selenium.common.exceptions import NoSuchElementException
 
 # create a logger instance
 logger = Logger(logger="BasePage").getlog()
@@ -61,6 +60,7 @@ class BasePage(object):
 
     # 定位元素方法
     def find_element(self, selector):
+        self.switch_to_current_page()
         """
          这个地方为什么是根据=>来切割字符串，请看页面里定位元素的方法
          submit_btn = "id=>su"
@@ -108,12 +108,55 @@ class BasePage(object):
 
         return element
 
+    #选择多个元素。用来做判断之类的。只支持xpath选择。
+    def find_elements(self, selector):
+        driver = self.driver
+        elements = ''
+        if '=>' not in selector:
+            return self.driver.find_element_by_id(selector)
+        selector_by = selector.split('=>')[0]
+        selector_value = selector.split('=>')[1]
+
+        if selector_by == "i" or selector_by == 'id':
+            try:
+                elements = self.driver.find_elements_by_id(selector_value)
+                logger.info("Had find the element \' %s \' successful "
+                            "by %s via value: %s " % (elements.text, selector_by, selector_value))
+            except NoSuchElementException as e:
+                logger.error("NoSuchElementException: %s" % e)
+                self.get_windows_img()  # take screenshot
+        elif selector_by == "n" or selector_by == 'name':
+            elements = self.driver.find_elements_by_name(selector_value)
+        elif selector_by == "c" or selector_by == 'class_name':
+            elements = self.driver.find_elements_by_class_name(selector_value)
+        elif selector_by == "l" or selector_by == 'link_text':
+            elements = self.driver.find_elements_by_link_text(selector_value)
+        elif selector_by == "p" or selector_by == 'partial_link_text':
+            elements = self.driver.find_elements_by_partial_link_text(selector_value)
+        elif selector_by == "t" or selector_by == 'tag_name':
+            elements = self.driver.find_elements_by_tag_name(selector_value)
+        elif selector_by == "x" or selector_by == 'xpath':
+            try:
+                elements = self.driver.find_elements_by_xpath(selector_value)
+                logger.info("Had find the element successful "
+                            "by %s" % selector_value)
+            except NoSuchElementException as e:
+                logger.error("NoSuchElementException: %s" % e)
+                self.get_windows_img()
+        elif selector_by == "s" or selector_by == 'selector_selector':
+            elements = self.driver.find_elements_by_css_selector(selector_value)
+        else:
+            raise NameError("Please enter a valid type of targeting elements.")
+
+        return elements
+
     # 输入
     def type(self, selector, text):
 
         el = self.find_element(selector)
         el.clear()
         try:
+            text = str(text)
             text = unicode(text, "utf8")
             el.send_keys(text)
             logger.info("Had type \' %s \' in inputBox" % text)
@@ -132,23 +175,26 @@ class BasePage(object):
             logger.error("Failed to clear in input box with %s" % e)
             self.get_windows_img()
 
-    # 点击元素
-    def click(self, selector):
+    # 先切换到当前页面。用于点击之后会跳出新的页面，不在当前页面的情况。
+    def switch_to_current_page(self):
         print 'get into title:' + self.get_page_title()
-        # 先切换到当前窗口
         driver = self.driver
         handles = driver.window_handles
         for handle in handles:
             if driver.current_window_handle != handle:
                 driver.switch_to.window(handle)
 
-        print unicode('当前页面title:', 'utf8') + self.get_page_title() + unicode(', 选择器：','utf8') + selector
+        print unicode('当前页面title:', 'utf8') + self.get_page_title()
+
+    # 点击元素
+    def click(self, selector):
+        self.switch_to_current_page()
         #查找元素
         el = self.find_element(selector)
         try:
             el.click()
             #logger.info("The element \' %s \' was clicked." % el.text)
-
+            self.switch_to_current_page()
         except NameError as e:
             logger.error("Failed to click the element with %s" % e)
 
