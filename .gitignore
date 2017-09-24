@@ -1,0 +1,6 @@
+*.log
+*Project_Default.xml
+./logs/
+./screenshots/
+*.pyc
+.idea/
