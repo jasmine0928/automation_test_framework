@@ -39,6 +39,10 @@ class ZiDingYi(BasePage):
     queding_button = "class_name=>confirm_btn "
     # 删除展板按钮
     rmTemp_button = "xpath=>//*[@id='content']/div[1]/i"
+    # 进入某个展板入口
+    temp_room_link="xpath=>//*[@id='nav']/section/section/div/nav/ul/li[6]/ul/li"
+
+
 
     # 点击自定义展板下拉框
     def click_zidingyi_button(self):
@@ -184,3 +188,31 @@ class ZiDingYi(BasePage):
         self.click(self.rmTemp_button)
         self.click("xpath=>//*[@id='btnDialogBySHFConfirm']")
         self.sleep(2)
+    # 循环删除展板
+    def click_rmTemps_button(self):
+        self.sleep(2)
+        self.click(self.zidingyi_button)
+        # 获取展板长度
+        size = len(self.find_element(self.temp_room_link))
+        self.sleep(2)
+        added4=''
+        self.click(self.zidingyi_button)
+        for x in range(0, size):
+            self.click(self.zidingyi_button)
+        elements = self.find_elements(self.temp_room_link)
+        el = elements[x]
+        if el.text not in added4:
+            print 'will add patameter:' + el.text
+            # 点击过的元素加入added
+            added4 += el.text
+            el.click()
+
+            self.sleep(2)
+
+
+
+
+
+
+        #
+
