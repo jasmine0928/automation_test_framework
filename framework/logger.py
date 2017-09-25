@@ -3,7 +3,7 @@ import logging
 import os.path
 import time
 
-
+#Logger是打印日志的。
 class Logger(object):
     def __init__(self, logger):
         '''''
