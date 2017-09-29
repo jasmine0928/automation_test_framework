@@ -17,7 +17,7 @@ class TestLogin(unittest.TestCase):
     def test_login(self):
         success = True
         driver = self.driver
-        #driver.get("https://nccloud.weihong.com.cn/nccloudmes/view/login.html")
+        driver.get("https://nccloud.weihong.com.cn/nccloudmestest/view/msg_warming.html")
 
         login_page = LoginPage(self.driver)
         login_page.type_login("18329030871","123456","520135")

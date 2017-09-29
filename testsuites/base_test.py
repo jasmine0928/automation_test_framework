@@ -11,7 +11,7 @@ from pageobjects.production_monitoring import ProductionMonitoringPage
 
 class BaseTest(unittest.TestCase):
 
-    url_msg_warning = "https://nccloud.weihong.com.cn/nccloudmes/view/msg_warming.html"
+    url_msg_warning = "https://nccloud.weihong.com.cn/nccloudmestest/view/msg_warming.html "
 
     def setUp(self):
         browse = BrowserEngine(self)

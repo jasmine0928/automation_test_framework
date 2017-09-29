@@ -1,7 +1,7 @@
 # coding=utf-8
 import os.path
 import time
-
+from selenium import webdriver
 from framework.logger import Logger
 from selenium.common.exceptions import NoSuchElementException
 
@@ -14,10 +14,12 @@ class BasePage(object):
     定义一个页面基类，让所有页面都继承这个类，封装一些常用的页面操作方法到这个类
     """
     def __init__(self, driver):
+        # 使用当前浏览器
         self.driver = driver
 
     # quit browser and end testing
     def quit_browser(self):
+        #
         self.driver.quit()
 
     # 浏览器前进操作
@@ -60,7 +62,6 @@ class BasePage(object):
 
     # 定位元素方法
     def find_element(self, selector):
-        self.switch_to_current_page()
         """
          这个地方为什么是根据=>来切割字符串，请看页面里定位元素的方法
          submit_btn = "id=>su"
@@ -175,30 +176,57 @@ class BasePage(object):
             logger.error("Failed to clear in input box with %s" % e)
             self.get_windows_img()
 
-    # 先切换到当前页面。用于点击之后会跳出新的页面，不在当前页面的情况。
-    def switch_to_current_page(self):
-        print 'get into title:' + self.get_page_title()
+    #刷新页面。定义在基类里，以后可以直接调用。
+    def refresh(self):
+        self.driver.refresh()
+        self.sleep(3)
+        logger.info('refresh page successful.')
+
+    #切换到新窗口
+    def switch_to_new_window(self):
         driver = self.driver
-        handles = driver.window_handles
-        for handle in handles:
-            if driver.current_window_handle != handle:
-                driver.switch_to.window(handle)
+        for handle in driver.window_handles:  # 切换窗口（切换到搜狗）
+            if handle != driver.current_window_handle:
+                driver.switch_to_window(handle)
 
-        print unicode('当前页面title:', 'utf8') + self.get_page_title()
-
-    # 点击元素
+    # 点击元素，
     def click(self, selector):
-        self.switch_to_current_page()
+        #self.switch_to_current_page()
+        driver = self.driver
+        current_window = driver.current_window_handle
+        before_windows = ''
+        for handle in driver.window_handles:
+            before_windows += handle
         #查找元素
         el = self.find_element(selector)
         try:
             el.click()
             #logger.info("The element \' %s \' was clicked." % el.text)
-            self.switch_to_current_page()
+            self.sleep(1)
+            after_windows = ''
+            for handle in driver.window_handles:
+                after_windows += handle
+            #check if need to switch window. me me da.
+            self.switch_to_current_window(current_window, before_windows, after_windows)
         except NameError as e:
             logger.error("Failed to click the element with %s" % e)
 
-    # 或者网页标题
+    #切换到当前窗口
+    def switch_to_current_window(self,current_window, before_windows , after_windows):
+        driver = self.driver
+        #之前的窗口不在了，说明点击操作关闭了该窗口。那么切换到目前所有页面的最后一个窗口
+        if current_window not in after_windows:
+            for handle in driver.window_handles:
+                driver.switch_to.window(handle)
+        #之后的窗口比之前的窗口多，说明之后的窗口中有新打开的。那么切换到新打开的窗口。
+        elif len(after_windows) > len(before_windows):
+            for handle in driver.window_handles:
+                #如果窗口不是当前的窗口，则需要切换
+                if handle != current_window:
+                    driver.switch_to.window(handle)
+        return
+
+    # 或者网页标题，
     def get_page_title(self):
         logger.info("Current page title is %s" % self.driver.title)
         return self.driver.title

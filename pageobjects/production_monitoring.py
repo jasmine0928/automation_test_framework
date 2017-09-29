@@ -5,9 +5,8 @@ from framework.base_page import BasePage
 
 # 定义一个生产监控页面
 class ProductionMonitoringPage(BasePage):
-    url = "https://nccloud.weihong.com.cn/nccloudmes/view/production_monitoring.html"
+  #  url = "https://nccloud.weihong.com.cn/nccloudmes/view/production_monitoring.html"
     production_monitoring_link = "xpath=>//*[@id='nav']/section/section/div/nav/ul/li[2]/a"
-
     # 把lili这个设备放在monitor_lili_link里面
     monitor_lili_link = "selector_selector=>#WHNC-300A-GNGN-01BC"
     # xuanzhe shebei xialakuang
@@ -115,7 +114,9 @@ class ProductionMonitoringPage(BasePage):
                 self.sleep(2)
                 el.click()
                 self.sleep(3)
+            #点击所有的移除按钮
             self.click_all_remove_button()
             self.sleep(5)
+            #添加所有的设备参数
             self.add_all_monitor_params()
             self.sleep(3)

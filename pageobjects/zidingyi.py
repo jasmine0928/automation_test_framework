@@ -1,8 +1,7 @@
 # coding=utf-8
 # 导入基类页面basepage
 from framework.base_page import BasePage
-
-
+from selenium import webdriver
 class ZiDingYi(BasePage):
     # 自定义展板
     zidingyi_button = "xpath=>//*[@id='nav']/section/section/div/nav/ul/li[6]/a"
@@ -14,7 +13,7 @@ class ZiDingYi(BasePage):
     cancel_button = "xpath=>//*[@id='content']/div[2]/div[3]/button[1]"
     # OK按钮
     ok_button = "xpath=>//*[@id='content']/div[2]/div[3]/button[2]"
-    # 自定义的新展板
+    # 新建的第一个展板
     tempName_link = "xpath=>//*[@id='nav']/section/section/div/nav/ul/li[6]/ul/li[2]"
     # 添加自定义模块
     add_iconfont_button = "xpath=>//*[@id='content']/section/section/div/div[2]/section/div"
@@ -38,10 +37,10 @@ class ZiDingYi(BasePage):
     # 确定按钮
     queding_button = "class_name=>confirm_btn "
     # 删除展板按钮
-    rmTemp_button = "xpath=>//*[@id='content']/div[1]/i"
+    rmTemp_button = "class_name=>rmTemp"
     # 进入某个展板入口
     temp_room_link="xpath=>//*[@id='nav']/section/section/div/nav/ul/li[6]/ul/li"
-
+    #url = "https://nccloud.weihong.com.cn/nccloudmes/view/production_monitoring.html"
 
 
     # 点击自定义展板下拉框
@@ -70,10 +69,14 @@ class ZiDingYi(BasePage):
         self.click(self.cancel_button)
         self.sleep(2)
 
-    # 点击自定义设备展板
-    def click_tempName_link(self):
+
+
+    # j进入新建的第一个展板
+    def go_tempName_link(self):
         self.click(self.tempName_link)
         self.sleep(2)
+
+
 
     # 添加的展示块选择设备和内容
     def click_add_iconfont_button(self):
@@ -183,36 +186,78 @@ class ZiDingYi(BasePage):
         self.click(self.queding_button)
         self.sleep(2)
 
+
+# 循环添加展板和展板参数
+    def click_add_temps(self):
+        list = ['lili','a3','a4']
+        for i in range(len(list)):
+            # 点击自定义下拉框
+            self.sleep(2)
+            self.click(self.zidingyi_button)
+            a=list[i]
+            self.click_newactive_button()
+            self.sleep(2)
+            self.type_newactivename_input(a)
+            self.sleep(2)
+            self.click_ok_button()
+            self.sleep(2)
+            # 进入新添的展板
+            #self.sleep(2)
+            #self.go_tempName_link()
+            # 在新添的展板中连续添加某个参数
+            #self.click_add_iconfont_button()
+            #self.add_machines()
+            self.sleep(2)
+            self.click_rmTemps_button()
+            # 点开自定义展板下拉框
+            self.click(self.zidingyi_button)
+
+
     # 删除展板
     def click_rmTemp_button(self):
         self.click(self.rmTemp_button)
         self.click("xpath=>//*[@id='btnDialogBySHFConfirm']")
         self.sleep(2)
+
+
+
     # 循环删除展板
     def click_rmTemps_button(self):
+        # 刷新页面，主要防止自定义下拉框已下拉
+        self.refresh()
         self.sleep(2)
+        # 点击自定义下拉框
         self.click(self.zidingyi_button)
         # 获取展板长度
-        size = len(self.find_element(self.temp_room_link))
+        size = len(self.find_elements(self.temp_room_link))
         self.sleep(2)
-        added4=''
-        self.click(self.zidingyi_button)
-        for x in range(0, size):
+        # 当展板名获取成功后，把获取成功的展板名添加到这步
+        added = ''
+        for x in range(1, size):
+            self.refresh()
             self.click(self.zidingyi_button)
-        elements = self.find_elements(self.temp_room_link)
-        el = elements[x]
-        if el.text not in added4:
-            print 'will add patameter:' + el.text
-            # 点击过的元素加入added
-            added4 += el.text
-            el.click()
+            elements = self.find_elements(self.temp_room_link)
+            #这里不应该是elements[x]，应该是1.意思是：每次都删除展板的第二个元素。(第一个元素是新建展板，不管。)
+            el = elements[1]
+            if el.text not in added:
+                print 'will add patameter:' + el.text
+                # 点击过的元素加入added
+                added += el.text
+                el.click()
+                self.switch_to_new_window()
+                self.click(self.rmTemp_button)
+                # 点击弹出框的确定按钮,
+                self.click("xpath=>//*[@id='btnDialogBySHFConfirm']")
+                self.sleep(2)
 
-            self.sleep(2)
 
 
 
 
 
 
-        #
+
+
+
+
 

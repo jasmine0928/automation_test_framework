@@ -6,7 +6,7 @@ from framework.base_page import BasePage
 class LoginPage(BasePage):
 
     #登录页面的地址
-    url = "https://nccloud.weihong.com.cn/nccloudmes/view/login.html"
+    url = "https://nccloud.weihong.com.cn/nccloudmestest/view/msg_warming.html"
     #下面三行分别是定位账号密码验证码的输入框，xpath
     account_input = "xpath=>//*[@id='account']"
     password_input = "xpath=>//*[@id='password']"
